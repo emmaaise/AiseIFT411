@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../models/task.dart';
-import 'month.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   double? _deviceHeight, _deviceWidth;
-  String? content;
+  String content = ''; // Initialize content to an empty string
   Box? _box;
 
   @override
@@ -45,6 +44,10 @@ class _TasksPageState extends State<TasksPage> {
               style: TextStyle(
                   decoration: task.done ? TextDecoration.lineThrough : null),
             ),
+            subtitle: Text(
+              task.timeStamp.toString(), // Display the date and time
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -76,11 +79,11 @@ class _TasksPageState extends State<TasksPage> {
     return FutureBuilder(
         future: Hive.openBox("tasks"),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          if (snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
             _box = snapshot.data;
             return _todoList();
-          } else {
-            return const Center(child: CircularProgressIndicator());
           }
         });
   }
@@ -93,11 +96,12 @@ class _TasksPageState extends State<TasksPage> {
             title: const Text("Add a Todo"),
             content: TextField(
               onSubmitted: (value) {
-                if (content != null) {
+                if (content.isNotEmpty) { // Check if content is not empty
                   var task = Task(
-                      todo: content!, timeStamp: DateTime.now(), done: false);
+                      todo: content, timeStamp: DateTime.now(), done: false);
                   _box!.add(task.toMap());
                   setState(() {
+                    content = ''; // Reset content after adding
                     Navigator.pop(context);
                   });
                 }

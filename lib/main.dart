@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Todo App', // Updated title
+      title: 'Flutter Todo App', 
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
